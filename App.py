@@ -1,7 +1,7 @@
 import streamlit as st
-import pandas as py
+import pandas as pds
 
 st.sidebar.radio(
     'Select an option',
-    ('Home','Overall Analysis', 'Team Analysis', 'Season Analysis')
+    ('Medal Tally', 'Overall Analysis', 'Country wise analysis', 'Athlete wise analysis')
 )
