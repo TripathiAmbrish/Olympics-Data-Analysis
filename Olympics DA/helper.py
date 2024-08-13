@@ -64,3 +64,20 @@ def year_country_list(ae_df):
     country.insert(0, 'Overall')
 
     return years, country
+
+
+def participating_nations_over_time(ae_df):
+    nations_over_time = ae_df.drop_duplicates(['Year', 'region'])
+    nations_over_time = nations_over_time['Year'].value_counts().reset_index()
+    nations_over_time.columns = ['Edition', 'No of Countries']
+    nations_over_time = nations_over_time.sort_values('Edition')
+
+    return nations_over_time
+
+def no_of_events_over_time(ae_df):
+    no_of_events = ae_df.drop_duplicates(['Year', 'Event'])
+    no_of_events = no_of_events['Year'].value_counts().reset_index()
+    no_of_events.columns = ['Edition', 'No of Events']
+    no_of_events = no_of_events.sort_values('Edition')
+
+    return no_of_events
