@@ -3,6 +3,8 @@ import pandas as pd
 import preprocessor
 import helper
 import plotly.express as px
+import  matplotlib.pyplot as plt
+import seaborn as sbn
 
 ae_df = pd.read_csv('athlete_events.csv')
 reg_df = pd.read_csv('noc_regions.csv')
@@ -84,6 +86,30 @@ if user_menu == 'Overall Analysis':
     st.plotly_chart(fig)
 
     no_of_events = helper.no_of_events_over_time(ae_df)
-    fig2 = px.line(no_of_events, x='Edition', y='No of Events')
+    fig = px.line(no_of_events, x='Edition', y='No of Events')
     st.title('No. of events over the years')
-    st.plotly_chart(fig2)
+    st.plotly_chart(fig)
+
+    no_of_athletes = helper.no_of_athletes_over_time(ae_df)
+    fig = px.line(no_of_athletes, x='Edition', y='No of Athletes')
+    st.title('No. of Athletes over the years')
+    st.plotly_chart(fig)
+
+    st.title("No. of Events over time (each sport)")
+    fig,ax = plt.subplots(figsize = [20, 20])
+    heat_m = ae_df.drop_duplicates(['Year', 'Sport', 'Event'])
+    sbn.heatmap(heat_m.pivot_table(index='Sport', columns='Year', values='Event', aggfunc='count').fillna(0).astype('int'), annot=True)
+
+    st.pyplot(fig)
+
+    st.title("Most Successful Athletes")
+    sport_list = ae_df['Sport'].unique().tolist()
+    sport_list.sort()
+    sport_list.insert(0, 'Overall')
+
+    selected_sport = st.selectbox('Select a sport', sport_list)
+    x = helper.most_successful(ae_df, selected_sport)
+    if x.empty:
+        st.write("No data available for the selected criteria.")
+    else:
+        st.table(x)

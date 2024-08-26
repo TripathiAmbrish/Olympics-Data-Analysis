@@ -81,3 +81,28 @@ def no_of_events_over_time(ae_df):
     no_of_events = no_of_events.sort_values('Edition')
 
     return no_of_events
+
+def no_of_athletes_over_time(ae_df):
+    no_of_athletes = ae_df.drop_duplicates(['Year', 'Name'])
+    no_of_athletes = no_of_athletes['Year'].value_counts().reset_index()
+    no_of_athletes.columns = ['Edition', 'No of Athletes']
+    no_of_athletes = no_of_athletes.sort_values('Edition')
+
+    return no_of_athletes
+
+
+def most_successful(ae_df, sport):
+    temp_df = ae_df.dropna(subset=['Medal'])
+    if sport != 'Overall':
+        temp_df = temp_df[temp_df['Sport'] == sport]
+    medal_count = temp_df['Name'].value_counts().reset_index()
+
+    medal_count.columns = ['Name', 'Medals']  # 'Name' is the former index, 'Medals' is the count
+
+    if medal_count.empty:
+        return pd.DataFrame(columns=['Name', 'Medals', 'Sport', 'region'])
+
+    x = medal_count.head(20).merge(ae_df, left_on='Name', right_on='Name', how='left')[
+        ['Name', 'Medals', 'Sport', 'region']
+    ].drop_duplicates()
+    return x
