@@ -95,14 +95,21 @@ def most_successful(ae_df, sport):
     temp_df = ae_df.dropna(subset=['Medal'])
     if sport != 'Overall':
         temp_df = temp_df[temp_df['Sport'] == sport]
+
     medal_count = temp_df['Name'].value_counts().reset_index()
-
-    medal_count.columns = ['Name', 'Medals']  # 'Name' is the former index, 'Medals' is the count
-
-    if medal_count.empty:
-        return pd.DataFrame(columns=['Name', 'Medals', 'Sport', 'region'])
+    medal_count.columns = ['Name', 'Medals']
 
     x = medal_count.head(20).merge(ae_df, left_on='Name', right_on='Name', how='left')[
         ['Name', 'Medals', 'Sport', 'region']
     ].drop_duplicates()
+
     return x
+
+
+def yearwise_medal_tally(ae_df, country):
+    temp_df = ae_df.dropna(subset=['Medal'])
+    temp_df.drop_duplicates(subset=['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event'], inplace=True)
+    new_df = temp_df[temp_df['region'] == country]
+    final_df = new_df.groupby('Year').count()['Medal'].reset_index()
+
+    return final_df

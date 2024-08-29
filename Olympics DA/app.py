@@ -14,7 +14,7 @@ ae_df = preprocessor.preprocess(ae_df, reg_df)
 st.sidebar.title('Olympics Analysis')
 user_menu = st.sidebar.radio(
     'Select an option',
-    ('Medal Tally', 'Overall Analysis', 'Country wise analysis', 'Athlete wise analysis')
+    ('Medal Tally', 'Overall Analysis', 'Country-wise analysis', 'Athlete wise analysis')
 )
 
 if user_menu == 'Medal Tally':
@@ -109,7 +109,18 @@ if user_menu == 'Overall Analysis':
 
     selected_sport = st.selectbox('Select a sport', sport_list)
     x = helper.most_successful(ae_df, selected_sport)
-    if x.empty:
-        st.write("No data available for the selected criteria.")
-    else:
-        st.table(x)
+    st.table(x)
+
+
+if user_menu == 'Country-wise analysis':
+
+    st.title('Country wise analysis')
+
+    country_lst = ae_df['region'].dropna().unique().tolist()
+    country_lst.sort()
+    selected_country = st.selectbox('Select a country', country_lst)
+
+    country_df = helper.yearwise_medal_tally(ae_df, selected_country)
+    fig = px.line(country_df, x='Year', y='Medal')
+    st.title(selected_country + 'Medals over the years')
+    st.plotly_chart(fig)
