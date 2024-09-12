@@ -114,13 +114,24 @@ if user_menu == 'Overall Analysis':
 
 if user_menu == 'Country-wise analysis':
 
-    st.title('Country wise analysis')
+    st.sidebar.title('Country wise analysis')
 
     country_lst = ae_df['region'].dropna().unique().tolist()
     country_lst.sort()
-    selected_country = st.selectbox('Select a country', country_lst)
+    selected_country = st.sidebar.selectbox('Select a country', country_lst)
 
     country_df = helper.yearwise_medal_tally(ae_df, selected_country)
     fig = px.line(country_df, x='Year', y='Medal')
-    st.title(selected_country + 'Medals over the years')
+    st.title(selected_country + ' Medals over the years')
+    
     st.plotly_chart(fig)
+
+    st.title(selected_country + " excels in the following sports")
+    pt = helper.country_event_heatmap(ae_df,selected_country)
+    fig, ax = plt.subplots(figsize=(20, 20))
+    ax = sbn.heatmap(pt,annot=True)
+    st.pyplot(fig)
+
+    st.title("Top 10 Athletes of " + selected_country)
+    top10_df = helper.most_successful_countrywise(ae_df,selected_country)
+    st.table(top10_df)
