@@ -124,10 +124,15 @@ def country_event_heatmap(ae_df,country):
     return pt
 
 def most_successful_countrywise(ae_df, country):
-    temp_df = ae_df.dropna(subset = ['Medal'])
+    temp_df = ae_df.dropna(subset=['Medal'])
     
     temp_df = temp_df[temp_df['region'] == country]
-        
-    x = temp_df['Name'].value_counts().reset_index().head(20).merge(ae_df, left_on = 'index', right_on = 'Name', how = 'left')[['index', 'Name_x', 'Sport']].drop_duplicates()
-    x.rename(columns = {'index': 'Name', 'Name_x': 'Medals'},inplace = True)
+
+    medal_count = temp_df['Name'].value_counts().reset_index()
+    medal_count.columns = ['Name', 'Medals']
+
+    x = medal_count.head(20).merge(ae_df, left_on='Name', right_on='Name', how='left')[
+        ['Name', 'Medals', 'Sport']
+    ].drop_duplicates()
+
     return x
