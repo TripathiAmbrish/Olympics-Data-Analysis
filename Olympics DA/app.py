@@ -149,7 +149,7 @@ if user_menu == 'Athlete wise analysis':
     x3 = athlete_df[athlete_df['Medal'] == 'Silver']['Age'].dropna()
     x4 = athlete_df[athlete_df['Medal'] == 'Bronze']['Age'].dropna()
 
-    fig = pff.create_distplot([x1, x2, x3, x4], ['Overall Age', 'Gold Medalist', 'Silver Medalist', 'Bronze Medalist'],show_hist=False, show_rug=False)
+    fig = pff.create_distplot([x1,x2,x3,x4], ['Overall Age','Gold Medalist','Silver Medalist','Bronze Medalist'], show_hist=False, show_rug=False)
     fig.update_layout(autosize=False, width=800, height=600)
     st.plotly_chart(fig)
 
@@ -169,11 +169,13 @@ if user_menu == 'Athlete wise analysis':
         x.append(temp_df[temp_df['Medal'].notna()]['Age'].dropna())
         name.append(sport)
 
+    
+    medal_list = ae_df['Medal'].unique().tolist()
+    medal_list.sort()
+    medal_list.insert(0, 'Overall')
+
+    selected_medal = st.selectbox('Select a medal', medal_list)
     fig = pff.create_distplot(x, name, show_hist=False, show_rug=False)
     fig.update_layout(autosize=False, width=800, height=600)
-    st.title("Distribution of Age wrt Sports")
+    st.title("Distribution of Age wrt Sports", selected_medal)
     st.plotly_chart(fig)
-
-    #medal_lst = ae_df['Medal'].dropna().unique().tolist()
-    #medal_lst.sort()
-    #medal_country = st.sidebar.selectbox('Select a country', medal_lst)
