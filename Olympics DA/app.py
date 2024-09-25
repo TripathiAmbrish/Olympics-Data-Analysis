@@ -13,6 +13,7 @@ reg_df = pd.read_csv('noc_regions.csv')
 ae_df = preprocessor.preprocess(ae_df, reg_df)
 
 st.sidebar.title('Olympics Analysis')
+st.sidebar.image('https://img.freepik.com/premium-photo/five-interlocking-olympic-rings-white-background-generative-ai_437323-8460.jpg?w=900', use_column_width = True)
 user_menu = st.sidebar.radio(
     'Select an option',
     ('Medal Tally', 'Overall Analysis', 'Country-wise analysis', 'Athlete wise analysis')
@@ -112,6 +113,27 @@ if user_menu == 'Overall Analysis':
     x = helper.most_successful(ae_df, selected_sport)
     st.table(x)
 
+    st.title("Olympic Medals Distribution by Country")
+    medal_list = ['Overall', 'Gold', 'Silver', 'Bronze']
+    selected_medal = st.sidebar.selectbox('Select Medal Type', medal_list)
+
+    country_lst = ae_df['region'].dropna().unique().tolist()
+    country_lst.sort()
+    selected_country = st.selectbox('Select a country', country_lst)
+
+    map_data = helper.get_medal_data_for_map(selected_medal, selected_country)
+    fig = px.choropleth(map_data,
+                    locations="NOC",
+                    color="Medal_Count",
+                    hover_name="Country",
+                    hover_data=["Medal_Count"],
+                    color_continuous_scale="Viridis",
+                    projection="natural earth",
+                    title=f"Distribution of {selected_medal} Medals by Country")
+
+# Display the choropleth map in the app
+    st.plotly_chart(fig)
+
 
 if user_menu == 'Country-wise analysis':
 
@@ -149,7 +171,7 @@ if user_menu == 'Athlete wise analysis':
     x3 = athlete_df[athlete_df['Medal'] == 'Silver']['Age'].dropna()
     x4 = athlete_df[athlete_df['Medal'] == 'Bronze']['Age'].dropna()
 
-    fig = pff.create_distplot([x1,x2,x3,x4], ['Overall Age','Gold Medalist','Silver Medalist','Bronze Medalist'], show_hist=False, show_rug=False)
+    fig = pff.create_distplot([x1, x2, x3, x4], ['Overall Age', 'Gold Medalist', 'Silver Medalist', 'Bronze Medalist'],show_hist=False, show_rug=False)
     fig.update_layout(autosize=False, width=800, height=600)
     st.plotly_chart(fig)
 
@@ -169,13 +191,29 @@ if user_menu == 'Athlete wise analysis':
         x.append(temp_df[temp_df['Medal'].notna()]['Age'].dropna())
         name.append(sport)
 
-    
-    medal_list = ae_df['Medal'].unique().tolist()
-    medal_list.sort()
-    medal_list.insert(0, 'Overall')
-
-    selected_medal = st.selectbox('Select a medal', medal_list)
     fig = pff.create_distplot(x, name, show_hist=False, show_rug=False)
     fig.update_layout(autosize=False, width=800, height=600)
-    st.title("Distribution of Age wrt Sports", selected_medal)
+    st.title("Distribution of Age wrt Sports")
     st.plotly_chart(fig)
+
+    #medal_lst = ae_df['Medal'].dropna().unique().tolist()
+    #medal_lst.sort()
+    #medal_country = st.sidebar.selectbox('Select a country', medal_lst)
+
+    st.title('Weigh vs Height Distribution')
+    sport_list = ae_df['Sport'].unique().tolist()
+    sport_list.sort()
+    sport_list.insert(0, 'Overall')
+
+    selected_sport = st.selectbox('Select a sport', sport_list)
+    temp_df = helper.weight_v_height(ae_df, selected_sport)
+    fig, ax = plt.subplots()
+    ax = sbn.scatterplot(x = 'Weight', y = 'Height', data = temp_df, hue = 'Medal', style = 'Sex', s = 100)    
+    st.plotly_chart(fig)
+
+    st.title('Male vs Fenale participation over the years')
+    m_f = helper.male_v_female_partcipation(ae_df)
+    fig = px.line(m_f, x = 'Year', y = ['Male', 'Female'])
+    fig.update_layout(autosize=False, width=800, height=600)
+    st.plotly_chart(fig)
+

@@ -136,3 +136,41 @@ def most_successful_countrywise(ae_df, country):
     ].drop_duplicates()
 
     return x
+
+def weight_v_height(ae_df, sport):
+    athlete_df = ae_df.drop_duplicates(subset=['Name', 'region'])
+    athlete_df['Medal'].fillna('No Medal', inplace=True)
+    if sport != 'Overall':
+        temp_df = athlete_df[athlete_df['Sport'] == sport]
+        return temp_df
+    else:
+        return athlete_df
+    
+def male_v_female_partcipation(ae_df):
+    athlete_df = ae_df.drop_duplicates(subset=['Name', 'region'])
+    men = athlete_df[athlete_df['Sex'] == 'M'].groupby('Year').count()['Name'].reset_index()
+    women = athlete_df[athlete_df['Sex'] == 'F'].groupby('Year').count()['Name'].reset_index()
+
+    m_f = men.merge(women, on = 'Year', how = 'left')
+    m_f.rename(columns = {'Name_x':'Male', 'Name_y':'Female'}, inplace = True)
+    m_f.fillna(0, inplace=True)
+
+    return m_f
+
+def get_medal_data_for_map(ae_df, selected_medal):
+    # Assuming 'ae_df' is the main DataFrame containing Olympic data.
+    athlete_df = ae_df.drop_duplicates(subset=['Name', 'region'])
+
+    # If selected_medal is 'Overall', count all medals
+    if selected_medal == 'Overall':
+        medal_df = athlete_df[athlete_df['Medal'].notna()]
+    else:
+        medal_df = athlete_df[athlete_df['Medal'] == selected_medal]
+
+    # Grouping by 'NOC' (country code) and counting medals
+    medal_count_df = medal_df.groupby(['NOC', 'region']).size().reset_index(name='Medal_Count')
+
+    # Rename columns for clarity
+    medal_count_df.rename(columns={'region': 'Country'}, inplace=True)
+
+    return medal_count_df
