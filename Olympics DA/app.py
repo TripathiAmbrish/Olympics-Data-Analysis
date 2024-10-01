@@ -117,21 +117,31 @@ if user_menu == 'Overall Analysis':
     medal_list = ['Overall', 'Gold', 'Silver', 'Bronze']
     selected_medal = st.sidebar.selectbox('Select Medal Type', medal_list)
 
-    country_lst = ae_df['region'].dropna().unique().tolist()
-    country_lst.sort()
-    selected_country = st.selectbox('Select a country', country_lst)
+    map_data = helper.get_medal_data_for_map(ae_df, selected_medal)
 
-    map_data = helper.get_medal_data_for_map(selected_medal, selected_country)
+    custom_color_scale = [
+    (0.0, "rgb(77, 0, 38)"),       
+    (0.2, "rgb(128, 0, 38)"),      
+    (0.3, "rgb(189, 0, 38)"),      
+    (0.4, "rgb(227, 26, 28)"),     
+    (0.5, "rgb(252, 78, 42)"),     
+    (0.6, "rgb(253, 141, 60)"),    
+    (0.7, "rgb(254, 178, 76)"),    
+    (0.8, "rgb(254, 217, 118)"),   
+    (0.9, "rgb(255, 237, 160)"),   
+    (1.0, "rgb(255, 255, 204)")    
+    ]
+
     fig = px.choropleth(map_data,
-                    locations="NOC",
-                    color="Medal_Count",
-                    hover_name="Country",
-                    hover_data=["Medal_Count"],
-                    color_continuous_scale="Viridis",
-                    projection="natural earth",
-                    title=f"Distribution of {selected_medal} Medals by Country")
+                        locations="NOC",
+                        color="Medal_Count",
+                        hover_name="Country",
+                        hover_data=["Medal_Count"],
+                        color_continuous_scale=custom_color_scale,  # Apply the custom color scale here
+                        projection="natural earth",
+                        title=f"Distribution of {selected_medal} Medals by Country"
+       )
 
-# Display the choropleth map in the app
     st.plotly_chart(fig)
 
 
