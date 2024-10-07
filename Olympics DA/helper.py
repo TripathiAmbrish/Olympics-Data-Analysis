@@ -158,19 +158,14 @@ def male_v_female_partcipation(ae_df):
     return m_f
 
 def get_medal_data_for_map(ae_df, selected_medal):
-    # Assuming 'ae_df' is the main DataFrame containing Olympic data.
     athlete_df = ae_df.drop_duplicates(subset=['Name', 'region'])
 
-    # If selected_medal is 'Overall', count all medals
     if selected_medal == 'Overall':
         medal_df = athlete_df[athlete_df['Medal'].notna()]
     else:
         medal_df = athlete_df[athlete_df['Medal'] == selected_medal]
 
-    # Grouping by 'NOC' (country code) and counting medals
     medal_count_df = medal_df.groupby(['NOC', 'region']).size().reset_index(name='Medal_Count')
-
-    # Rename columns for clarity
     medal_count_df.rename(columns={'region': 'Country'}, inplace=True)
 
     return medal_count_df

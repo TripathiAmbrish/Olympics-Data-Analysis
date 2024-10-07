@@ -113,37 +113,6 @@ if user_menu == 'Overall Analysis':
     x = helper.most_successful(ae_df, selected_sport)
     st.table(x)
 
-    st.title("Olympic Medals Distribution by Country")
-    medal_list = ['Overall', 'Gold', 'Silver', 'Bronze']
-    selected_medal = st.sidebar.selectbox('Select Medal Type', medal_list)
-
-    map_data = helper.get_medal_data_for_map(ae_df, selected_medal)
-
-    custom_color_scale = [
-    (0.0, "rgb(77, 0, 38)"),       
-    (0.2, "rgb(128, 0, 38)"),      
-    (0.3, "rgb(189, 0, 38)"),      
-    (0.4, "rgb(227, 26, 28)"),     
-    (0.5, "rgb(252, 78, 42)"),     
-    (0.6, "rgb(253, 141, 60)"),    
-    (0.7, "rgb(254, 178, 76)"),    
-    (0.8, "rgb(254, 217, 118)"),   
-    (0.9, "rgb(255, 237, 160)"),   
-    (1.0, "rgb(255, 255, 204)")    
-    ]
-
-    fig = px.choropleth(map_data,
-                        locations="NOC",
-                        color="Medal_Count",
-                        hover_name="Country",
-                        hover_data=["Medal_Count"],
-                        color_continuous_scale=custom_color_scale,  # Apply the custom color scale here
-                        projection="natural earth",
-                        title=f"Distribution of {selected_medal} Medals by Country"
-       )
-
-    st.plotly_chart(fig)
-
 
 if user_menu == 'Country-wise analysis':
 
@@ -160,14 +129,49 @@ if user_menu == 'Country-wise analysis':
     st.plotly_chart(fig)
 
     st.title(selected_country + " excels in the following sports")
-    pt = helper.country_event_heatmap(ae_df,selected_country)
-    fig, ax = plt.subplots(figsize=(20, 20))
-    ax = sbn.heatmap(pt,annot=True)
-    st.pyplot(fig)
+
+    pt = helper.country_event_heatmap(ae_df, selected_country)
+
+    if pt.empty:
+      st.write(f"No data available for {selected_country} in the selected period.")
+    else:
+      fig, ax = plt.subplots(figsize=(20, 20))
+      ax = sbn.heatmap(pt, annot=True)
+      st.pyplot(fig)
 
     st.title("Top 10 Athletes of " + selected_country)
     top10_df = helper.most_successful_countrywise(ae_df,selected_country)
     st.table(top10_df)
+
+    selected_medal = 'Overall'  # Set default medal filter
+
+    st.title('Medal Distribution for All the countries')
+    map_data = helper.get_medal_data_for_map(ae_df, selected_medal)
+
+    custom_color_scale = [
+        (0.0, "rgb(77, 0, 38)"),       
+        (0.2, "rgb(128, 0, 38)"),      
+        (0.3, "rgb(189, 0, 38)"),      
+        (0.4, "rgb(227, 26, 28)"),     
+        (0.5, "rgb(252, 78, 42)"),     
+        (0.6, "rgb(253, 141, 60)"),    
+        (0.7, "rgb(254, 178, 76)"),    
+        (0.8, "rgb(254, 217, 118)"),   
+        (0.9, "rgb(255, 237, 160)"),   
+        (1.0, "rgb(255, 255, 204)")    
+    ]
+
+    fig = px.choropleth(map_data,
+                    locations="NOC",
+                    color="Medal_Count",
+                    hover_name="Country",
+                    hover_data=["Medal_Count"],
+                    color_continuous_scale=custom_color_scale,  # Apply the custom color scale here
+                    projection="natural earth",
+                    title=f"Distribution of Medals by Country"
+    )
+
+    st.plotly_chart(fig)
 
 
 if user_menu == 'Athlete wise analysis':
