@@ -118,10 +118,10 @@ if user_menu == 'Country-wise analysis':
 
     st.sidebar.title('Country wise analysis')
 
+    
     country_lst = ae_df['region'].dropna().unique().tolist()
     country_lst.sort()
     selected_country = st.sidebar.selectbox('Select a country', country_lst)
-
     country_df = helper.yearwise_medal_tally(ae_df, selected_country)
     fig = px.line(country_df, x='Year', y='Medal')
     st.title(selected_country + ' Medals over the years')
@@ -133,44 +133,70 @@ if user_menu == 'Country-wise analysis':
     pt = helper.country_event_heatmap(ae_df, selected_country)
 
     if pt.empty:
-      st.write(f"No data available for {selected_country} in the selected period.")
+        st.write(f"No data available for {selected_country} in the selected period.")
     else:
-      fig, ax = plt.subplots(figsize=(20, 20))
-      ax = sbn.heatmap(pt, annot=True)
-      st.pyplot(fig)
+        fig, ax = plt.subplots(figsize=(20, 20))
+        ax = sbn.heatmap(pt, annot=True)
+        st.pyplot(fig)
 
     st.title("Top 10 Athletes of " + selected_country)
     top10_df = helper.most_successful_countrywise(ae_df,selected_country)
     st.table(top10_df)
 
-    selected_medal = 'Overall'  # Set default medal filter
+    years = ae_df['Year'].dropna().unique().tolist()
+    years.sort()
+    years.insert(0, 'Overall')
+    selected_year = st.sidebar.selectbox("Select Year", years)
 
-    st.title('Medal Distribution for All the countries')
-    map_data = helper.get_medal_data_for_map(ae_df, selected_medal)
 
+    country_lst = ae_df['region'].dropna().unique().tolist()
+    country_lst.sort()
+    selected_cntry = st.sidebar.selectbox('Select a country', country_lst)
+# Fetch medal tally based on the selected filters
+    medal_tally = helper.fetch_medal_tally(ae_df, selected_year, selected_cntry)
+
+# Define title based on user selection
+    if selected_year == 'Overall' and selected_cntry == 'Overall':
+        st.title("Overall Medal Tally")
+    elif selected_year != 'Overall' and selected_cntry == 'Overall':
+        st.title("Medal Tally in " + str(selected_year))
+    elif selected_year == 'Overall' and selected_cntry != 'Overall':
+        st.title(selected_cntry + "'s Overall Medal Tally")
+    else:
+        st.title(selected_cntry + "'s Medal Tally in " + str(selected_year))
+
+# Display table of medal tally
+    st.table(medal_tally)
+
+# Fetch map data for the visualization
+    map_data = helper.prepare_map_data(medal_tally, selected_year, selected_cntry)
+
+# Custom color scale for the map
     custom_color_scale = [
-        (0.0, "rgb(77, 0, 38)"),       
-        (0.2, "rgb(128, 0, 38)"),      
-        (0.3, "rgb(189, 0, 38)"),      
-        (0.4, "rgb(227, 26, 28)"),     
-        (0.5, "rgb(252, 78, 42)"),     
-        (0.6, "rgb(253, 141, 60)"),    
-        (0.7, "rgb(254, 178, 76)"),    
-        (0.8, "rgb(254, 217, 118)"),   
-        (0.9, "rgb(255, 237, 160)"),   
-        (1.0, "rgb(255, 255, 204)")    
+        (0.0, "rgb(77, 0, 38)"),
+        (0.2, "rgb(128, 0, 38)"),
+        (0.3, "rgb(189, 0, 38)"),
+        (0.4, "rgb(227, 26, 28)"),
+        (0.5, "rgb(252, 78, 42)"),
+        (0.6, "rgb(253, 141, 60)"),
+        (0.7, "rgb(254, 178, 76)"),
+        (0.8, "rgb(254, 217, 118)"),
+        (0.9, "rgb(255, 237, 160)"),
+        (1.0, "rgb(255, 255, 204)")
     ]
 
+# Create the geopolitical map with Plotly
     fig = px.choropleth(map_data,
-                    locations="NOC",
-                    color="Medal_Count",
+                    locations="NOC",  # Assuming NOC is the country code column
+                    color="total",    # Visualizing the total medal count
                     hover_name="Country",
-                    hover_data=["Medal_Count"],
-                    color_continuous_scale=custom_color_scale,  # Apply the custom color scale here
+                    hover_data=["Gold", "Silver", "Bronze", "total"],
+                    color_continuous_scale=custom_color_scale,
                     projection="natural earth",
-                    title=f"Distribution of Medals by Country"
+                    title=f"Medal Distribution in {selected_year if selected_year != 'Overall' else 'All Years'}"
     )
 
+# Plot the map in Streamlit
     st.plotly_chart(fig)
 
 

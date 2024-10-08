@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 def fetch_medal_tally(ae_df, year, country):
     flag = 0
@@ -157,15 +158,16 @@ def male_v_female_partcipation(ae_df):
 
     return m_f
 
-def get_medal_data_for_map(ae_df, selected_medal):
-    athlete_df = ae_df.drop_duplicates(subset=['Name', 'region'])
+def prepare_map_data(ae_df, medal_tally, year, country):
+    # Reset the index of the medal tally dataframe to have 'region' as a column
+    medal_tally.reset_index(inplace=True)
 
-    if selected_medal == 'Overall':
-        medal_df = athlete_df[athlete_df['Medal'].notna()]
-    else:
-        medal_df = athlete_df[athlete_df['Medal'] == selected_medal]
+    # Add country code (NOC) based on the 'region' (country) for mapping
+    # Assuming you have a dataframe (noc_region_df) that maps 'region' to 'NOC'
+    noc_region_df = ae_df[['region', 'NOC']].drop_duplicates()  # Create NOC and region mapping
+    map_data = pd.merge(medal_tally, noc_region_df, on='region', how='left')
 
-    medal_count_df = medal_df.groupby(['NOC', 'region']).size().reset_index(name='Medal_Count')
-    medal_count_df.rename(columns={'region': 'Country'}, inplace=True)
+    # Rename columns for better readability in hover info
+    map_data.rename(columns={'region': 'Country'}, inplace=True)
 
-    return medal_count_df
+    return map_data
