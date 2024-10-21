@@ -121,7 +121,7 @@ if user_menu == 'Country-wise analysis':
     
     country_lst = ae_df['region'].dropna().unique().tolist()
     country_lst.sort()
-    selected_country = st.sidebar.selectbox('Select a country', country_lst)
+    selected_country = st.sidebar.selectbox('Select a country', country_lst, key = 'country selected')
     country_df = helper.yearwise_medal_tally(ae_df, selected_country)
     fig = px.line(country_df, x='Year', y='Medal')
     st.title(selected_country + ' Medals over the years')
@@ -151,7 +151,7 @@ if user_menu == 'Country-wise analysis':
 
     country_lst = ae_df['region'].dropna().unique().tolist()
     country_lst.sort()
-    selected_cntry = st.sidebar.selectbox('Select a country', country_lst)
+    selected_cntry = st.sidebar.selectbox('Select a country', country_lst, key = 'country_selection')
 # Fetch medal tally based on the selected filters
     medal_tally = helper.fetch_medal_tally(ae_df, selected_year, selected_cntry)
 
@@ -167,37 +167,6 @@ if user_menu == 'Country-wise analysis':
 
 # Display table of medal tally
     st.table(medal_tally)
-
-# Fetch map data for the visualization
-    map_data = helper.prepare_map_data(medal_tally, selected_year, selected_cntry)
-
-# Custom color scale for the map
-    custom_color_scale = [
-        (0.0, "rgb(77, 0, 38)"),
-        (0.2, "rgb(128, 0, 38)"),
-        (0.3, "rgb(189, 0, 38)"),
-        (0.4, "rgb(227, 26, 28)"),
-        (0.5, "rgb(252, 78, 42)"),
-        (0.6, "rgb(253, 141, 60)"),
-        (0.7, "rgb(254, 178, 76)"),
-        (0.8, "rgb(254, 217, 118)"),
-        (0.9, "rgb(255, 237, 160)"),
-        (1.0, "rgb(255, 255, 204)")
-    ]
-
-# Create the geopolitical map with Plotly
-    fig = px.choropleth(map_data,
-                    locations="NOC",  # Assuming NOC is the country code column
-                    color="total",    # Visualizing the total medal count
-                    hover_name="Country",
-                    hover_data=["Gold", "Silver", "Bronze", "total"],
-                    color_continuous_scale=custom_color_scale,
-                    projection="natural earth",
-                    title=f"Medal Distribution in {selected_year if selected_year != 'Overall' else 'All Years'}"
-    )
-
-# Plot the map in Streamlit
-    st.plotly_chart(fig)
 
 
 if user_menu == 'Athlete wise analysis':

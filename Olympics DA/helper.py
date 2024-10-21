@@ -158,16 +158,3 @@ def male_v_female_partcipation(ae_df):
 
     return m_f
 
-def prepare_map_data(ae_df, medal_tally, year, country):
-    # Reset the index of the medal tally dataframe to have 'region' as a column
-    medal_tally.reset_index(inplace=True)
-
-    # Add country code (NOC) based on the 'region' (country) for mapping
-    # Assuming you have a dataframe (noc_region_df) that maps 'region' to 'NOC'
-    noc_region_df = ae_df[['region', 'NOC']].drop_duplicates()  # Create NOC and region mapping
-    map_data = pd.merge(medal_tally, noc_region_df, on='region', how='left')
-
-    # Rename columns for better readability in hover info
-    map_data.rename(columns={'region': 'Country'}, inplace=True)
-
-    return map_data
