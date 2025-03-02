@@ -3,7 +3,7 @@ import pandas as pd
 import preprocessor
 import helper
 import plotly.express as px
-import  matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import seaborn as sbn
 import plotly.figure_factory as pff
 
@@ -13,7 +13,7 @@ reg_df = pd.read_csv('noc_regions.csv')
 ae_df = preprocessor.preprocess(ae_df, reg_df)
 
 st.sidebar.title('Olympics Analysis')
-st.sidebar.image('https://img.freepik.com/premium-photo/five-interlocking-olympic-rings-white-background-generative-ai_437323-8460.jpg?w=900', use_column_width = True)
+st.sidebar.image('https://img.freepik.com/premium-photo/five-interlocking-olympic-rings-white-background-generative-ai_437323-8460.jpg?w=900', use_container_width=True)
 user_menu = st.sidebar.radio(
     'Select an option',
     ('Medal Tally', 'Overall Analysis', 'Country-wise analysis', 'Athlete wise analysis')
