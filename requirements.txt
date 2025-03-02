@@ -1,7 +1,6 @@
-streamlit
+pandas
 plotly
+streamlit
 seaborn
 matplotlib
-seaborn
-plotly
-scipy
+pandas-datareader
