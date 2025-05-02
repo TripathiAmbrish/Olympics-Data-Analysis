@@ -1,0 +1,3 @@
+# System-level dependencies required for Streamlit Community Cloud
+libgl1-mesa-glx
+libglib2.0-0

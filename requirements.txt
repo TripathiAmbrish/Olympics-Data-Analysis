@@ -1,4 +1,6 @@
-streamlit
+pandas
 plotly
+streamlit
 seaborn
 matplotlib
+pandas-datareader
